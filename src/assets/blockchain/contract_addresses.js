@@ -1,0 +1,1 @@
+export const presaleContract = "0x848866702EAEfBffc248Ec2e25d5825b93dE0617#code"
