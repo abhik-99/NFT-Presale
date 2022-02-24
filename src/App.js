@@ -23,8 +23,10 @@ import MetamaskPromptDialog from "./ui/MetamaskPromptDialog";
 function App() {
   const [metamaskPrompt, setMetamaskPrompt] = useState(false);
   useEffect(() => {
+    console.log("Inside Use effect 1")
     if(!window.ethereum) setMetamaskPrompt((prev)=>true);
     else {
+      window.ethereum.request({ method: 'eth_requestAccounts' })
       window.ethereum.on('chainChanged', (chainId) => {
         window.location.reload();
       });
