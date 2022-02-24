@@ -12,7 +12,7 @@ import { SOCIALS } from '../assets/statics/socials';
 import { styled } from '@mui/system';
 
 
-const Footer = () => {
+const Header = () => {
   const theme = useTheme();
   return (
     <>
@@ -26,7 +26,9 @@ const Footer = () => {
               aria-label={item.name+'icon'}
               href={item.link}
               target="_blank"
-              rel="noopener noreferrer">
+              rel="noopener noreferrer"
+              key={"header-icon"+index}
+              >
                 {item.icon}
               </IconButton>
               )
@@ -40,4 +42,4 @@ const Footer = () => {
   )
 }
 
-export default Footer
+export default Header

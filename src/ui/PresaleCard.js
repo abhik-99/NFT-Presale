@@ -17,14 +17,18 @@ import {
   Stack,
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
+import { ethers } from "ethers";
 
 import { PRESALE_DETAILS } from '../assets/statics/presale';
 import CardDetailsDialog from './CardDetailsDialog';
 import MetamaskPromptDialog from './MetamaskPromptDialog';
 import AvaxSwitchDialog from './AvaxSwitchDialog';
-import { ethers } from 'ethers';
 
-const PresaleCard = ({contract}) => {
+import presale_abi from "../assets/blockchain/presale_abi.json";
+
+import { presaleContract } from "../assets/blockchain/contract_addresses";
+
+const PresaleCard = () => {
   const theme = useTheme();
   const [selected, setSelected] = useState(PRESALE_DETAILS[0]);
   const [cardDetailsOpen, setCardDetailsOpen] = useState(false);
@@ -36,8 +40,22 @@ const PresaleCard = ({contract}) => {
   const handleCardSelect = (e) => {
     setSelected(e.target.value);
   };
-  const handleBuyClick = (e) => {
+  const handleBuyClick = async (e) => {
+    e.preventDefault();
     console.log("Selected Card", selected);
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
+    console.log("Provider", provider)
+    const signer = provider.getSigner();
+    console.log("Signer", signer);
+    const contract = new ethers.Contract(presaleContract, presale_abi, signer);
+    console.log("Contract", contract);
+
+    const unsignedTransaction = contract.buy({payableAmount: selected.price, saleId: selected.index});
+
+    const signedTransaction = await signer.signTransaction(unsignedTransaction)
+
+    console.log("Transaction unsigned", unsignedTransaction);
+    console.log("Transaction signed", signedTransaction);
   }
   const handleLogIn = async () => {
     if(!window.ethereum) {
@@ -47,6 +65,9 @@ const PresaleCard = ({contract}) => {
     } else {
       const provider = new ethers.providers.Web3Provider(window.ethereum);
       const signer = provider.getSigner();
+      const response = await signer.signMessage("Welcome to Jack-of-all-Trades. By signing this login message you agree to all terms and conditions and take responsibility for your actions.");
+      console.log("Sign message response", response);
+
       setLoggedInAccount(await signer.getAddress());
       setInterval(() => setLoggedIn(true), 2000);
 
@@ -58,7 +79,7 @@ const PresaleCard = ({contract}) => {
     <Fade in={true} timeout={1500}>
       <Card sx={{ borderRadius: theme.shape.borderRadius + 10, mx:{ sm: 10}}}>
         <CardContent sx={{ px: {xs: 5}, position: 'relative'}}>
-          <Fade in={!loggedIn} timeout={1000}>
+          <Fade in={!loggedIn} timeout={500}>
             <Box
             sx={{
               position: 'absolute',
@@ -81,7 +102,7 @@ const PresaleCard = ({contract}) => {
             }
             {
               loggedInAccount &&
-              <Fade in={loggedInAccount? true: false} timeout={1000}>
+              <Fade in={loggedInAccount? true: false} timeout={500}>
                 <Typography noWrap sx={{pr:1}}>Connected to {loggedInAccount}</Typography>
               </Fade>
             }
