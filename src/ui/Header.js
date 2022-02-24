@@ -16,11 +16,10 @@ const Footer = () => {
   const theme = useTheme();
   return (
     <>
-    <Toolbar />
-    <AppBar position="static" color="primary" sx={{ top: 'auto', bottom: 0, background: 'none' }}>
+    <AppBar position="static" color="primary" sx={{ background: 'none'}} elevation={0}>
       <Toolbar sx={{display: 'flex',justifyContent:"center"}}>
-      <Slide in={true} timeout={2000} direction="up">
-          <Paper sx={{ width: {xs: '80%', md:'50%', lg: '30%'}, pb: 4, pt: 5, px: 2, borderRadius: '100% 100% 0 0', display: 'flex', justifyContent: 'space-evenly', alignItems: 'center', background: theme.palette.common.black}}>
+      <Slide in={true} timeout={2000} direction="down">
+          <Paper sx={{ width: {xs: '80%', md:'50%', lg: '30%'}, pb: 4, pt: 2, px: 2, borderRadius: '0 0 100% 100%', display: 'flex', justifyContent: 'space-evenly', alignItems: 'center', background: theme.palette.common.black}}>
             {
               SOCIALS.map((item, index) =>
               <IconButton
