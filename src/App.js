@@ -54,8 +54,8 @@ function App() {
         <Header />
         <Box sx={{ flexGrow: 1, pt: 10}}>
           <Fade in={true} timeout={1000}>
-            <Paper sx={{background: 'none',display: 'flex', alignItems: 'center', justifyContent: 'center'}} elevation={0}>
-              <img src={logo} alt="Jack of All Trades Logo" height={useMediaQuery(theme.breakpoints.down('sm')) ? theme.spacing(20) : theme.spacing(25)} sx={{display: {sm: 'none'}}}/>
+            <Paper sx={{background: 'none',display: 'flex', alignItems: 'center', justifyContent: 'center', backdropFilter: 'blur(6px)'}} elevation={0}>
+              <img src={logo} alt="Jack of All Trades Logo" height={useMediaQuery(theme.breakpoints.down('sm')) ? theme.spacing(20) : theme.spacing(35)} />
               <Typography variant="h1"><span style={{color: theme.palette.primary.main}}>Jack</span>-of-All-<span style={{color: theme.palette.secondary.main}}>Trades</span></Typography>
             </Paper>
           </Fade>

@@ -24,6 +24,11 @@ const CardDetailsDialog = ({open, onClose, card}) => {
         </Box>
         <Divider />
         <Box sx={{my: 1, display: 'flex', alignItems: 'center', justifyContent: 'space-between'}}>
+          <Typography>Cards Sold:</Typography>
+          <Typography>{card.sold} Cards</Typography>
+        </Box>
+        <Divider />
+        <Box sx={{my: 1, display: 'flex', alignItems: 'center', justifyContent: 'space-between'}}>
           <Typography>Presale Limit:</Typography>
           <Typography>{card.limit} Cards</Typography>
         </Box>

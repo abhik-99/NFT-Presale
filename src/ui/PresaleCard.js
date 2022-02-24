@@ -2,10 +2,8 @@ import React, {useState} from 'react';
 import {
   Card,
   CardContent,
-  Grid,
   Button,
   ButtonBase,
-  TextField,
   InputLabel,
   FormControl,
   Select,
@@ -26,36 +24,46 @@ import AvaxSwitchDialog from './AvaxSwitchDialog';
 
 import presale_abi from "../assets/blockchain/presale_abi.json";
 
-import { presaleContract } from "../assets/blockchain/contract_addresses";
+import { presaleContractAddress } from "../assets/blockchain/contract_addresses";
 
 const PresaleCard = () => {
   const theme = useTheme();
   const [selected, setSelected] = useState(PRESALE_DETAILS[0]);
   const [cardDetailsOpen, setCardDetailsOpen] = useState(false);
+  const [cardDetails, setCardDetails] = useState(PRESALE_DETAILS[0]);
   const [loggedIn, setLoggedIn] = useState(false);
   const [metamaskPrompt, setMetamaskPrompt] = useState(false);
   const [avaxSwitchPrompt, setAvaxSwitchPrompt] = useState(false);
   const [loggedInAccount, setLoggedInAccount] = useState(undefined);
 
+  const handleCardDetails = async () => {
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
+    const presaleContract = new ethers.Contract(presaleContractAddress, presale_abi, provider);
+    const sold = (await presaleContract.saleStore(selected.index)).currentSale.toString();
+    setCardDetails({...selected, sold});
+    setCardDetailsOpen(true)
+  };
+
   const handleCardSelect = (e) => {
     setSelected(e.target.value);
   };
+
   const handleBuyClick = async (e) => {
     e.preventDefault();
-    console.log("Selected Card", selected);
-    const provider = new ethers.providers.Web3Provider(window.ethereum);
-    console.log("Provider", provider)
+    try {
+      const provider = new ethers.providers.Web3Provider(window.ethereum);
+
     const signer = provider.getSigner();
-    console.log("Signer", signer);
-    const contract = new ethers.Contract(presaleContract, presale_abi, signer);
-    console.log("Contract", contract);
 
-    const unsignedTransaction = contract.buy({payableAmount: selected.price, saleId: selected.index});
+    const presaleContract = new ethers.Contract(presaleContractAddress, presale_abi, signer);
 
-    const signedTransaction = await signer.signTransaction(unsignedTransaction)
+    await presaleContract.buy(parseInt(selected.index), {value: ethers.utils.parseUnits(selected.price.toString(), 18)});
 
-    console.log("Transaction unsigned", unsignedTransaction);
-    console.log("Transaction signed", signedTransaction);
+    } catch(e) {
+      console.log("Error Occured!", e);
+    }
+
+
   }
   const handleLogIn = async () => {
     if(!window.ethereum) {
@@ -114,7 +122,7 @@ const PresaleCard = () => {
             <img src={selected.image} alt={selected.name} height={useMediaQuery(theme.breakpoints.up('sm')) ? theme.spacing(20) : theme.spacing(10)}/>
           </ButtonBase>
           <ButtonBase sx={{ p: 1, borderRadius: theme.shape.borderRadius, mb: 2}}
-          onClick={() => setCardDetailsOpen(true)}>
+          onClick={handleCardDetails}>
             <Typography>
               Get Card Details
             </Typography>
@@ -143,7 +151,7 @@ const PresaleCard = () => {
         </CardContent>
       </Card>
     </Fade>
-    <CardDetailsDialog open={cardDetailsOpen} onClose={() => setCardDetailsOpen(false)} card={selected}/>
+    <CardDetailsDialog open={cardDetailsOpen} onClose={() => setCardDetailsOpen(false)} card={cardDetails}/>
     <MetamaskPromptDialog open={metamaskPrompt} onClose={() => setMetamaskPrompt(false)}/>
     <AvaxSwitchDialog open={avaxSwitchPrompt} onClose={() => setAvaxSwitchPrompt(false)} />
     </>
