@@ -1,70 +1,39 @@
-# Getting Started with Create React App
+# NFT Presale Site Demo
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+This is a demo project showcasing a DEMO of NFT Presale. In this case [this](https://testnet.snowtrace.io/address/0x848866702EAEfBffc248Ec2e25d5825b93dE0617#code) presale contract was used.
 
-## Available Scripts
+## Description
 
-In the project directory, you can run:
+The presale demo consists of 5 types of cards as existing in the presale contract at the time of writing - each having their own price and mint limits. The site loads with a message prompt to install *Metamask* if not installed. If installed, the used needs to connect it. The site prompts for switching chain from any Chain to either Avalanche Mainnet c-chain or Fuji Testnet. After this the user can connect to the site by presssing the **Connect** button. This prompts them to *sign a welcome messsage* accepting terms. They can select from the range of NFTs available on the card. The `Get Card Details` button helps in getting the details of the cards with the amount sold *in real time*. Once selected, the user may choose to buy the card by click the `Buy` button which creates a metamask transaction.
 
-### `npm start`
+**Note**: The user must have sufficient AVAX in their wallet to cover the NFT cost and gas fees. No error will me shown and the `Buy` button will simply not work otherwise. Ideally an error modal might be displayed but I haven't created that since this is just a demo.
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+## Run the Project
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+To run the project, 
+1. Install Node and NPM (preferrably the versions mentioned in the `"engines"` section of `package.json`).
+2. Clone the project and from the clonned directory run `npm install`.
+3. After installation finishes, run `npm start`.
 
-### `npm test`
+## Demo 
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+### Site Functioning
 
-### `npm run build`
+https://user-images.githubusercontent.com/38981107/155565727-d33cadc2-037a-4570-81fc-1ab9574f6e79.mp4
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+### Viewport Responsiveness
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+https://user-images.githubusercontent.com/38981107/155562292-a6e545f4-0059-4190-8f96-e99df0f3d6f4.mp4
 
-### `npm run eject`
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+## Stack
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+The site was built using:
+1. ReactJS
+2. MUI v5
+3. EthersJs
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+## Credits
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+The site was built by me. The contract was written by Peter Roy.
