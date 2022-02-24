@@ -1,5 +1,6 @@
 /** @jsxImportSource @emotion/react */
 import { css } from "@emotion/react";
+import { useEffect, useState } from "react";
 import {
   Container,
   ThemeProvider,
@@ -17,8 +18,33 @@ import PresaleCard from "./ui/PresaleCard";
 import Header from "./ui/Header";
 import logo from "./assets/images/logo.png";
 import joat_cards from "./assets/images/JOAT_Images_SVG.svg";
+import MetamaskPromptDialog from "./ui/MetamaskPromptDialog";
+import presale_abi from "./assets/blockchain/presale_abi.json";
+import { ethers } from "ethers";
+import { presaleContract } from "./assets/blockchain/contract_addresses";
 
 function App() {
+  const [metamaskPrompt, setMetamaskPrompt] = useState(false);
+  const [contract, setContract] = useState(undefined);
+  useEffect(() => {
+    if(!window.ethereum) setMetamaskPrompt(true);
+    else {
+      window.ethereum.on('chainChanged', (chainId) => {
+        window.location.reload();
+      });
+      window.ethereum.on('accountsChanged', (accounts) => window.location.reload());
+      const provider = new ethers.providers.Web3Provider(window.ethereum);
+      setContract(new ethers.Contract(presaleContract, presale_abi, provider));
+    }
+    return () => {
+
+      window.ethereum.removeListener('chainChanged', (chainId) => window.location.reload());
+
+      window.ethereum.removeListener('accountsChanged', (accounts) => window.location.reload());
+    }
+
+  }, [setMetamaskPrompt])
+
   return (
     <ThemeProvider theme={theme}>
     <div css={css`
@@ -51,7 +77,7 @@ function App() {
             </Grid>
 
             <Grid item xs={12} md={6} align="center">
-              <PresaleCard/>
+              <PresaleCard contract={contract}/>
             </Grid>
           </Grid>
         </Box>
@@ -61,6 +87,7 @@ function App() {
           </ButtonBase>
         </Box>
       </Container>
+      <MetamaskPromptDialog open={metamaskPrompt} onClose={() => setMetamaskPrompt(false)} />
     </div>
     </ThemeProvider>
   );

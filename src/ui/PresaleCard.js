@@ -20,22 +20,38 @@ import { useTheme } from '@mui/material/styles';
 
 import { PRESALE_DETAILS } from '../assets/statics/presale';
 import CardDetailsDialog from './CardDetailsDialog';
+import MetamaskPromptDialog from './MetamaskPromptDialog';
+import AvaxSwitchDialog from './AvaxSwitchDialog';
+import { ethers } from 'ethers';
 
-const PresaleCard = () => {
+const PresaleCard = ({contract}) => {
   const theme = useTheme();
   const [selected, setSelected] = useState(PRESALE_DETAILS[0]);
   const [cardDetailsOpen, setCardDetailsOpen] = useState(false);
   const [loggedIn, setLoggedIn] = useState(false);
+  const [metamaskPrompt, setMetamaskPrompt] = useState(false);
+  const [avaxSwitchPrompt, setAvaxSwitchPrompt] = useState(false);
+  const [loggedInAccount, setLoggedInAccount] = useState(undefined);
 
   const handleCardSelect = (e) => {
     setSelected(e.target.value);
   };
   const handleBuyClick = (e) => {
-    e.preventDefault();
     console.log("Selected Card", selected);
   }
-  const handleLogIn = () => {
-    setLoggedIn(true);
+  const handleLogIn = async () => {
+    if(!window.ethereum) {
+      setMetamaskPrompt(true);
+    } else if(!['43114', '43113'].includes(window.ethereum.networkVersion)) {
+      setAvaxSwitchPrompt(true);
+    } else {
+      const provider = new ethers.providers.Web3Provider(window.ethereum);
+      const signer = provider.getSigner();
+      setLoggedInAccount(await signer.getAddress());
+      setInterval(() => setLoggedIn(true), 2000);
+
+    }
+
   }
   return (
     <>
@@ -59,7 +75,17 @@ const PresaleCard = () => {
               justifyContent: 'center'
             }}
           >
-            <Button variant="contained" color="secondary" onClick={handleLogIn} sx={{boxShadow: `0px 0px 15px 10px ${theme.palette.secondary.dark}`}}>Connect</Button>
+            {
+              !loggedInAccount &&
+              <Button variant="contained" color="secondary" onClick={handleLogIn} sx={{boxShadow: `0px 0px 15px 10px ${theme.palette.secondary.dark}`}}>Connect</Button>
+            }
+            {
+              loggedInAccount &&
+              <Fade in={loggedInAccount? true: false} timeout={1000}>
+                <Typography noWrap sx={{pr:1}}>Connected to {loggedInAccount}</Typography>
+              </Fade>
+            }
+
           </Box>
         </Fade>
         <Stack>
@@ -97,6 +123,8 @@ const PresaleCard = () => {
       </Card>
     </Fade>
     <CardDetailsDialog open={cardDetailsOpen} onClose={() => setCardDetailsOpen(false)} card={selected}/>
+    <MetamaskPromptDialog open={metamaskPrompt} onClose={() => setMetamaskPrompt(false)}/>
+    <AvaxSwitchDialog open={avaxSwitchPrompt} onClose={() => setAvaxSwitchPrompt(false)} />
     </>
   )
 }
