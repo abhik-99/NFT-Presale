@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   Card,
   CardContent,
@@ -16,6 +16,7 @@ import {
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { ethers } from "ethers";
+import Color from 'color';
 
 import { PRESALE_DETAILS } from '../assets/statics/presale';
 import CardDetailsDialog from './CardDetailsDialog';
@@ -28,13 +29,21 @@ import { presaleContractAddress } from "../assets/blockchain/contract_addresses"
 
 const PresaleCard = () => {
   const theme = useTheme();
+  console.log("Theme", theme);
   const [selected, setSelected] = useState(PRESALE_DETAILS[0]);
   const [cardDetailsOpen, setCardDetailsOpen] = useState(false);
   const [cardDetails, setCardDetails] = useState(PRESALE_DETAILS[0]);
-  const [loggedIn, setLoggedIn] = useState(false);
+
   const [metamaskPrompt, setMetamaskPrompt] = useState(false);
   const [avaxSwitchPrompt, setAvaxSwitchPrompt] = useState(false);
+
+  const [overlayBgColor, setOverlayBgColor] = useState(Color.rgb(0, 0, 0).alpha(0.4).toString());
+  const [showOverlay, setShowOverlay] = useState(true);
   const [loggedInAccount, setLoggedInAccount] = useState(undefined);
+
+  const [error, setError] = useState(false);
+  const [responseMessage, setResponseMessage] = useState(undefined);
+
 
   const handleCardDetails = async () => {
     const provider = new ethers.providers.Web3Provider(window.ethereum);
@@ -53,17 +62,32 @@ const PresaleCard = () => {
     try {
       const provider = new ethers.providers.Web3Provider(window.ethereum);
 
-    const signer = provider.getSigner();
+      const signer = provider.getSigner();
 
-    const presaleContract = new ethers.Contract(presaleContractAddress, presale_abi, signer);
+      const presaleContract = new ethers.Contract(presaleContractAddress, presale_abi, signer);
 
-    await presaleContract.buy(parseInt(selected.index), {value: ethers.utils.parseUnits(selected.price.toString(), 18)});
+      const tx = await presaleContract.buy(parseInt(selected.index), {value: ethers.utils.parseUnits(selected.price.toString(), 18)});
+      const txResponse = await tx.wait();
+      setError(false);
+      setResponseMessage(txResponse);
+      setOverlayBgColor(Color(theme.palette.success.light).alpha(0.5).toString());
+      console.log("Transaction Response",txResponse);
+
 
     } catch(e) {
       console.log("Error Occured!", e);
+      setError(true);
+      setResponseMessage(e.data.message || e.message);
+      setOverlayBgColor(Color(theme.palette.error.dark).alpha(0.8).toString());
     }
 
+    setShowOverlay(() => true);
 
+    setTimeout(() => {
+      console.log("Overlay value", showOverlay);
+      setShowOverlay(false);
+      console.log("Setting overlay to false");
+    }, 5000);
   }
   const handleLogIn = async () => {
     if(!window.ethereum) {
@@ -77,7 +101,7 @@ const PresaleCard = () => {
       console.log("Sign message response", response);
 
       setLoggedInAccount(await signer.getAddress());
-      setInterval(() => setLoggedIn(true), 2000);
+      setTimeout(() => setShowOverlay(false), 2000);
 
     }
 
@@ -87,7 +111,7 @@ const PresaleCard = () => {
     <Fade in={true} timeout={1500}>
       <Card sx={{ borderRadius: theme.shape.borderRadius + 10, mx:{ sm: 10}}}>
         <CardContent sx={{ px: {xs: 5}, position: 'relative'}}>
-          <Fade in={!loggedIn} timeout={500}>
+          <Fade in={showOverlay} timeout={1000}>
             <Box
             sx={{
               position: 'absolute',
@@ -95,13 +119,14 @@ const PresaleCard = () => {
               left: 0,
               width: '100%',
               height: '100%',
-              bgcolor: 'rgba(0, 0, 0, 0.4)',
+              overflowWrap: 'anywhere',
+              bgcolor: overlayBgColor,
               backdropFilter: 'blur(4px)',
-              padding: '10px',
               zIndex: 10,
               display: 'flex',
               alignItems: 'center',
-              justifyContent: 'center'
+              justifyContent: 'center',
+              flexDirection: 'column'
             }}
           >
             {
@@ -109,10 +134,25 @@ const PresaleCard = () => {
               <Button variant="contained" color="secondary" onClick={handleLogIn} sx={{boxShadow: `0px 0px 15px 10px ${theme.palette.secondary.dark}`}}>Connect</Button>
             }
             {
-              loggedInAccount &&
-              <Fade in={loggedInAccount? true: false} timeout={500}>
-                <Typography noWrap sx={{pr:1}}>Connected to {loggedInAccount}</Typography>
-              </Fade>
+              loggedInAccount && !error && !responseMessage &&
+              <Typography sx={{pr:1}}>Connected to {loggedInAccount}</Typography>
+            }
+            {
+              responseMessage && error &&
+              <>
+              <Typography>Following error Occured: </Typography>
+              <Typography>{responseMessage}</Typography>
+              </>
+
+            }
+            {
+              responseMessage && !error &&
+              <Box>
+                <Typography>NFT Bought</Typography>
+                <Button
+                href={`${window.ethereum.networkVersion === 43113 ? 'https://testnet.snowtrace.io' : 'https://snowtrace.io/'}/tx/${responseMessage.transactionHash}`}
+                >Browse Transaction</Button>
+              </Box>
             }
 
           </Box>

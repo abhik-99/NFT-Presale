@@ -3,13 +3,11 @@ import {
   Slide,
   Paper,
   IconButton,
-  Box,
   AppBar,
   Toolbar
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { SOCIALS } from '../assets/statics/socials';
-import { styled } from '@mui/system';
 
 
 const Header = () => {
